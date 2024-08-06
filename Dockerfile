@@ -20,12 +20,3 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 
 # Kích hoạt mod_rewrite và mod_headers
 RUN a2enmod rewrite headers
-
-# Sao chép script entrypoint.sh vào container
-COPY entrypoint.sh /usr/local/bin/
-
-# Đặt quyền thực thi cho script
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
-# Đặt script làm entrypoint của container
-ENTRYPOINT ["entrypoint.sh"]

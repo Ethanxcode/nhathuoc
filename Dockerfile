@@ -8,7 +8,7 @@ WORKDIR /var/www/html
 RUN apt-get update && apt-get install -y \
     vim wget zip unzip libwebp-dev libjpeg-dev libpng-dev libfreetype6-dev libonig-dev libbz2-dev libzip-dev libxml2-dev libpq-dev \
     && docker-php-ext-install ctype fileinfo json mbstring bz2 pdo tokenizer xml zip bcmath gd \
-    && docker-php-ext-enable bz2 gd \
+    && docker-php-ext-enable bz2 gd pdo_mysql  \
     && ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
 # Set Apache document root to public directory
@@ -30,7 +30,6 @@ RUN echo "DirectoryIndex index.php" >> /etc/apache2/apache2.conf
 
 # Copy existing application directory contents and set permissions
 COPY --chown=www-data:www-data . /var/www/html
-
 
 # Install Node.js dependencies
 RUN npm install --legacy-peer-dep

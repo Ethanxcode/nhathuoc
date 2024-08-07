@@ -3,6 +3,7 @@ FROM php:7.4.1-apache
 # Set working directory
 WORKDIR /var/www/html
 
+
 # Install dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     vim wget zip unzip libwebp-dev libjpeg-dev libpng-dev libfreetype6-dev libonig-dev libbz2-dev libzip-dev libxml2-dev libpq-dev \
@@ -31,7 +32,8 @@ RUN echo "DirectoryIndex index.php" >> /etc/apache2/apache2.conf
 COPY --chown=www-data:www-data . /var/www/html
 
 # Install Node.js dependencies
-RUN npm install
+RUN npm install --legacy-peer-dep
+RUN npm run prod
 
 # Ensure correct permissions
 RUN chown -R www-data:www-data /var/www/html \

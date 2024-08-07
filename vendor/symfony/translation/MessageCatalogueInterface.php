@@ -25,14 +25,14 @@ interface MessageCatalogueInterface
     /**
      * Gets the catalogue locale.
      *
-     * @return string
+     * @return string The locale
      */
     public function getLocale();
 
     /**
      * Gets the domains.
      *
-     * @return array
+     * @return array An array of domains
      */
     public function getDomains();
 
@@ -41,11 +41,11 @@ interface MessageCatalogueInterface
      *
      * If $domain is null, it returns all messages.
      *
-     * @param string|null $domain The domain name
+     * @param string $domain The domain name
      *
-     * @return array
+     * @return array An array of messages
      */
-    public function all(?string $domain = null);
+    public function all(string $domain = null);
 
     /**
      * Sets a message translation.
@@ -62,7 +62,7 @@ interface MessageCatalogueInterface
      * @param string $id     The message id
      * @param string $domain The domain name
      *
-     * @return bool
+     * @return bool true if the message has a translation, false otherwise
      */
     public function has(string $id, string $domain = 'messages');
 
@@ -72,7 +72,7 @@ interface MessageCatalogueInterface
      * @param string $id     The message id
      * @param string $domain The domain name
      *
-     * @return bool
+     * @return bool true if the message has a translation, false otherwise
      */
     public function defines(string $id, string $domain = 'messages');
 
@@ -82,7 +82,7 @@ interface MessageCatalogueInterface
      * @param string $id     The message id
      * @param string $domain The domain name
      *
-     * @return string
+     * @return string The message translation
      */
     public function get(string $id, string $domain = 'messages');
 
@@ -120,14 +120,14 @@ interface MessageCatalogueInterface
     /**
      * Gets the fallback catalogue.
      *
-     * @return self|null
+     * @return self|null A MessageCatalogueInterface instance or null when no fallback has been set
      */
     public function getFallbackCatalogue();
 
     /**
      * Returns an array of resources loaded to build this collection.
      *
-     * @return ResourceInterface[]
+     * @return ResourceInterface[] An array of resources
      */
     public function getResources();
 

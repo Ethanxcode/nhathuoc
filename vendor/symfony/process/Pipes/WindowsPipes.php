@@ -88,7 +88,10 @@ class WindowsPipes extends AbstractPipes
         parent::__construct($input);
     }
 
-    public function __sleep(): array
+    /**
+     * @return array
+     */
+    public function __sleep()
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
@@ -149,7 +152,7 @@ class WindowsPipes extends AbstractPipes
             if ($w) {
                 @stream_select($r, $w, $e, 0, Process::TIMEOUT_PRECISION * 1E6);
             } elseif ($this->fileHandles) {
-                usleep((int) (Process::TIMEOUT_PRECISION * 1E6));
+                usleep(Process::TIMEOUT_PRECISION * 1E6);
             }
         }
         foreach ($this->fileHandles as $type => $fileHandle) {

@@ -25,7 +25,7 @@ Zepto(function($) {
    * highlight the current line
    */
   var renderCurrentCodeblock = function(id) {
-    Prism.highlightAllUnder(document.querySelector('.frame-code-container .frame-code.active'));
+    Prism.highlightAll();
     highlightCurrentLine();
   }
 
@@ -40,11 +40,7 @@ Zepto(function($) {
     $activeFrame.find('.code-block').first().css({
       maxHeight: 345,
       overflow: 'hidden',
-    });
-
-    var line = $activeFrame.find('.code-block .line-highlight').first()[0];
-    line.scrollIntoView();
-    line.parentElement.scrollTop -= 180;
+    }).scrollTop(999);
 
     $container.scrollTop(0);
   }
@@ -153,6 +149,9 @@ Zepto(function($) {
     }
   });
 
+  // Render late enough for highlightCurrentLine to be ready
+  renderCurrentCodeblock();
+
   // Avoid to quit the page with some protocol (e.g. IntelliJ Platform REST API)
   $ajaxEditors.on('click', function(e){
     e.preventDefault();
@@ -182,7 +181,4 @@ Zepto(function($) {
     e.preventDefault();
     setActiveFramesTab($(this));
   });
-
-  // Render late enough for highlightCurrentLine to be ready
-  renderCurrentCodeblock();
 });

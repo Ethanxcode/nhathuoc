@@ -72,7 +72,7 @@ class Response
     public const HTTP_PRECONDITION_REQUIRED = 428;                                       // RFC6585
     public const HTTP_TOO_MANY_REQUESTS = 429;                                           // RFC6585
     public const HTTP_REQUEST_HEADER_FIELDS_TOO_LARGE = 431;                             // RFC6585
-    public const HTTP_UNAVAILABLE_FOR_LEGAL_REASONS = 451;                               // RFC7725
+    public const HTTP_UNAVAILABLE_FOR_LEGAL_REASONS = 451;
     public const HTTP_INTERNAL_SERVER_ERROR = 500;
     public const HTTP_NOT_IMPLEMENTED = 501;
     public const HTTP_BAD_GATEWAY = 502;
@@ -138,7 +138,7 @@ class Response
      *
      * The list of codes is complete according to the
      * {@link https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml Hypertext Transfer Protocol (HTTP) Status Code Registry}
-     * (last updated 2021-10-01).
+     * (last updated 2016-03-01).
      *
      * Unless otherwise noted, the status code is defined in RFC2616.
      *
@@ -180,14 +180,14 @@ class Response
         410 => 'Gone',
         411 => 'Length Required',
         412 => 'Precondition Failed',
-        413 => 'Content Too Large',                                           // RFC-ietf-httpbis-semantics
+        413 => 'Payload Too Large',
         414 => 'URI Too Long',
         415 => 'Unsupported Media Type',
         416 => 'Range Not Satisfiable',
         417 => 'Expectation Failed',
         418 => 'I\'m a teapot',                                               // RFC2324
         421 => 'Misdirected Request',                                         // RFC7540
-        422 => 'Unprocessable Content',                                       // RFC-ietf-httpbis-semantics
+        422 => 'Unprocessable Entity',                                        // RFC4918
         423 => 'Locked',                                                      // RFC4918
         424 => 'Failed Dependency',                                           // RFC4918
         425 => 'Too Early',                                                   // RFC-ietf-httpbis-replay-04
@@ -246,7 +246,7 @@ class Response
      * one that will be sent to the client only if the prepare() method
      * has been called before.
      *
-     * @return string
+     * @return string The Response as an HTTP string
      *
      * @see prepare()
      */
@@ -298,7 +298,7 @@ class Response
             $charset = $this->charset ?: 'UTF-8';
             if (!$headers->has('Content-Type')) {
                 $headers->set('Content-Type', 'text/html; charset='.$charset);
-            } elseif (0 === stripos($headers->get('Content-Type') ?? '', 'text/') && false === stripos($headers->get('Content-Type') ?? '', 'charset')) {
+            } elseif (0 === stripos($headers->get('Content-Type'), 'text/') && false === stripos($headers->get('Content-Type'), 'charset')) {
                 // add the charset
                 $headers->set('Content-Type', $headers->get('Content-Type').'; charset='.$charset);
             }
@@ -395,11 +395,8 @@ class Response
 
         if (\function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
-        } elseif (\function_exists('litespeed_finish_request')) {
-            litespeed_finish_request();
         } elseif (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true)) {
             static::closeOutputBuffers(0, true);
-            flush();
         }
 
         return $this;
@@ -409,6 +406,8 @@ class Response
      * Sets the response content.
      *
      * @return $this
+     *
+     * @throws \UnexpectedValueException
      */
     public function setContent(?string $content)
     {
@@ -463,7 +462,7 @@ class Response
      *
      * @final
      */
-    public function setStatusCode(int $code, ?string $text = null): object
+    public function setStatusCode(int $code, string $text = null): object
     {
         $this->statusCode = $code;
         if ($this->isInvalid()) {
@@ -737,7 +736,7 @@ class Response
      *
      * @final
      */
-    public function setExpires(?\DateTimeInterface $date = null): object
+    public function setExpires(\DateTimeInterface $date = null): object
     {
         if (null === $date) {
             $this->headers->remove('Expires');
@@ -774,10 +773,8 @@ class Response
             return (int) $this->headers->getCacheControlDirective('max-age');
         }
 
-        if (null !== $expires = $this->getExpires()) {
-            $maxAge = (int) $expires->format('U') - (int) $this->getDate()->format('U');
-
-            return max($maxAge, 0);
+        if (null !== $this->getExpires()) {
+            return (int) $this->getExpires()->format('U') - (int) $this->getDate()->format('U');
         }
 
         return null;
@@ -821,7 +818,7 @@ class Response
      *
      * It returns null when no freshness information is present in the response.
      *
-     * When the response's TTL is 0, the response may not be served from cache without first
+     * When the responses TTL is <= 0, the response may not be served from cache without first
      * revalidating with the origin.
      *
      * @final
@@ -830,7 +827,7 @@ class Response
     {
         $maxAge = $this->getMaxAge();
 
-        return null !== $maxAge ? max($maxAge - $this->getAge(), 0) : null;
+        return null !== $maxAge ? $maxAge - $this->getAge() : null;
     }
 
     /**
@@ -886,7 +883,7 @@ class Response
      *
      * @final
      */
-    public function setLastModified(?\DateTimeInterface $date = null): object
+    public function setLastModified(\DateTimeInterface $date = null): object
     {
         if (null === $date) {
             $this->headers->remove('Last-Modified');
@@ -924,7 +921,7 @@ class Response
      *
      * @final
      */
-    public function setEtag(?string $etag = null, bool $weak = false): object
+    public function setEtag(string $etag = null, bool $weak = false): object
     {
         if (null === $etag) {
             $this->headers->remove('Etag');
@@ -1049,10 +1046,10 @@ class Response
 
         $ret = [];
         foreach ($vary as $item) {
-            $ret[] = preg_split('/[\s,]+/', $item);
+            $ret = array_merge($ret, preg_split('/[\s,]+/', $item));
         }
 
-        return array_merge([], ...$ret);
+        return $ret;
     }
 
     /**
@@ -1079,6 +1076,8 @@ class Response
      * If the Response is not modified, it sets the status code to 304 and
      * removes the actual content by calling the setNotModified() method.
      *
+     * @return bool true if the Response validators match the Request, false otherwise
+     *
      * @final
      */
     public function isNotModified(Request $request): bool
@@ -1091,26 +1090,12 @@ class Response
         $lastModified = $this->headers->get('Last-Modified');
         $modifiedSince = $request->headers->get('If-Modified-Since');
 
-        if (($ifNoneMatchEtags = $request->getETags()) && (null !== $etag = $this->getEtag())) {
-            if (0 == strncmp($etag, 'W/', 2)) {
-                $etag = substr($etag, 2);
-            }
-
-            // Use weak comparison as per https://tools.ietf.org/html/rfc7232#section-3.2.
-            foreach ($ifNoneMatchEtags as $ifNoneMatchEtag) {
-                if (0 == strncmp($ifNoneMatchEtag, 'W/', 2)) {
-                    $ifNoneMatchEtag = substr($ifNoneMatchEtag, 2);
-                }
-
-                if ($ifNoneMatchEtag === $etag || '*' === $ifNoneMatchEtag) {
-                    $notModified = true;
-                    break;
-                }
-            }
+        if ($etags = $request->getETags()) {
+            $notModified = \in_array($this->getEtag(), $etags) || \in_array('*', $etags);
         }
-        // Only do If-Modified-Since date comparison when If-None-Match is not present as per https://tools.ietf.org/html/rfc7232#section-3.3.
-        elseif ($modifiedSince && $lastModified) {
-            $notModified = strtotime($modifiedSince) >= strtotime($lastModified);
+
+        if ($modifiedSince && $lastModified) {
+            $notModified = strtotime($modifiedSince) >= strtotime($lastModified) && (!$etags || $notModified);
         }
 
         if ($notModified) {
@@ -1217,7 +1202,7 @@ class Response
      *
      * @final
      */
-    public function isRedirect(?string $location = null): bool
+    public function isRedirect(string $location = null): bool
     {
         return \in_array($this->statusCode, [201, 301, 302, 303, 307, 308]) && (null === $location ?: $location == $this->headers->get('Location'));
     }

@@ -21,11 +21,6 @@ final class CachingStream implements StreamInterface
     private $skipReadBytes = 0;
 
     /**
-     * @var StreamInterface
-     */
-    private $stream;
-
-    /**
      * We will treat the buffer object as the body of the stream
      *
      * @param StreamInterface $stream Stream to cache. The cursor is assumed to be at the beginning of the stream.
@@ -33,7 +28,7 @@ final class CachingStream implements StreamInterface
      */
     public function __construct(
         StreamInterface $stream,
-        ?StreamInterface $target = null
+        StreamInterface $target = null
     ) {
         $this->remoteStream = $stream;
         $this->stream = $target ?: new Stream(Utils::tryFopen('php://temp', 'r+'));
@@ -41,13 +36,7 @@ final class CachingStream implements StreamInterface
 
     public function getSize(): ?int
     {
-        $remoteSize = $this->remoteStream->getSize();
-
-        if (null === $remoteSize) {
-            return null;
-        }
-
-        return max($this->stream->getSize(), $remoteSize);
+        return max($this->stream->getSize(), $this->remoteStream->getSize());
     }
 
     public function rewind(): void

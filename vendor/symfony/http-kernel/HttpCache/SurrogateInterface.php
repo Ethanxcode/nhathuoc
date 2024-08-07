@@ -26,14 +26,14 @@ interface SurrogateInterface
     /**
      * Returns a new cache strategy instance.
      *
-     * @return ResponseCacheStrategyInterface
+     * @return ResponseCacheStrategyInterface A ResponseCacheStrategyInterface instance
      */
     public function createCacheStrategy();
 
     /**
      * Checks that at least one surrogate has Surrogate capability.
      *
-     * @return bool
+     * @return bool true if one surrogate has Surrogate capability, false otherwise
      */
     public function hasSurrogateCapability(Request $request);
 
@@ -52,19 +52,19 @@ interface SurrogateInterface
     /**
      * Checks that the Response needs to be parsed for Surrogate tags.
      *
-     * @return bool
+     * @return bool true if the Response needs to be parsed, false otherwise
      */
     public function needsParsing(Response $response);
 
     /**
      * Renders a Surrogate tag.
      *
-     * @param string|null $alt     An alternate URI
-     * @param string      $comment A comment to add as an esi:include tag
+     * @param string $alt     An alternate URI
+     * @param string $comment A comment to add as an esi:include tag
      *
      * @return string
      */
-    public function renderIncludeTag(string $uri, ?string $alt = null, bool $ignoreErrors = true, string $comment = '');
+    public function renderIncludeTag(string $uri, string $alt = null, bool $ignoreErrors = true, string $comment = '');
 
     /**
      * Replaces a Response Surrogate tags with the included resource content.

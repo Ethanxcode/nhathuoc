@@ -135,8 +135,9 @@ class Person extends \Faker\Provider\Person
     /**
      * @see https://en.wikipedia.org/wiki/National_identification_number#South_Africa
      *
-     * @param bool   $citizen
-     * @param string $gender
+     * @param \DateTime $birthdate
+     * @param bool      $citizen
+     * @param string    $gender
      *
      * @return string
      */
@@ -147,7 +148,7 @@ class Person extends \Faker\Provider\Person
         }
         $birthDateString = $birthdate->format('ymd');
 
-        switch (strtolower($gender ?: '')) {
+        switch (strtolower($gender)) {
             case static::GENDER_FEMALE:
                 $genderDigit = self::numberBetween(0, 4);
 

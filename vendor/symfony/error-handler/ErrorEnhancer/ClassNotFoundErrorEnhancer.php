@@ -21,6 +21,9 @@ use Symfony\Component\ErrorHandler\Error\FatalError;
  */
 class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function enhance(\Throwable $error): ?\Throwable
     {
         // Some specific versions of PHP produce a fatal error when extending a not found class.
@@ -90,25 +93,24 @@ class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
             if ($function[0] instanceof ClassLoader) {
                 foreach ($function[0]->getPrefixes() as $prefix => $paths) {
                     foreach ($paths as $path) {
-                        $classes[] = $this->findClassInPath($path, $class, $prefix);
+                        $classes = array_merge($classes, $this->findClassInPath($path, $class, $prefix));
                     }
                 }
 
                 foreach ($function[0]->getPrefixesPsr4() as $prefix => $paths) {
                     foreach ($paths as $path) {
-                        $classes[] = $this->findClassInPath($path, $class, $prefix);
+                        $classes = array_merge($classes, $this->findClassInPath($path, $class, $prefix));
                     }
                 }
             }
         }
 
-        return array_unique(array_merge([], ...$classes));
+        return array_unique($classes);
     }
 
     private function findClassInPath(string $path, string $class, string $prefix): array
     {
-        $path = realpath($path.'/'.strtr($prefix, '\\_', '//')) ?: realpath($path.'/'.\dirname(strtr($prefix, '\\_', '//'))) ?: realpath($path);
-        if (!$path || !is_dir($path)) {
+        if (!$path = realpath($path.'/'.strtr($prefix, '\\_', '//')) ?: realpath($path.'/'.\dirname(strtr($prefix, '\\_', '//'))) ?: realpath($path)) {
             return [];
         }
 

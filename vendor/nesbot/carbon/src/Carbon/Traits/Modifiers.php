@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Carbon\Traits;
 
 use Carbon\CarbonInterface;
@@ -75,7 +74,7 @@ trait Modifiers
      *
      * @param string|int|null $modifier
      *
-     * @return static|false
+     * @return static
      */
     public function next($modifier = null)
     {
@@ -157,7 +156,7 @@ trait Modifiers
      *
      * @param string|int|null $modifier
      *
-     * @return static|false
+     * @return static
      */
     public function previous($modifier = null)
     {
@@ -430,8 +429,6 @@ trait Modifiers
      * Calls \DateTime::modify if mutable or \DateTimeImmutable::modify else.
      *
      * @see https://php.net/manual/en/datetime.modify.php
-     *
-     * @return static|false
      */
     #[ReturnTypeWillChange]
     public function modify($modify)
@@ -451,7 +448,7 @@ trait Modifiers
      *
      * @param string $modifier
      *
-     * @return static|false
+     * @return static
      */
     public function change($modifier)
     {

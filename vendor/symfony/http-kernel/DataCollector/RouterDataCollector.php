@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 class RouterDataCollector extends DataCollector
 {
     /**
-     * @var \SplObjectStorage<Request, callable>
+     * @var \SplObjectStorage
      */
     protected $controllers;
 
@@ -36,7 +36,7 @@ class RouterDataCollector extends DataCollector
      *
      * @final
      */
-    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         if ($response instanceof RedirectResponse) {
             $this->data['redirect'] = true;
@@ -83,7 +83,7 @@ class RouterDataCollector extends DataCollector
     }
 
     /**
-     * @return string|null
+     * @return string|null The target URL
      */
     public function getTargetUrl()
     {
@@ -91,7 +91,7 @@ class RouterDataCollector extends DataCollector
     }
 
     /**
-     * @return string|null
+     * @return string|null The target route
      */
     public function getTargetRoute()
     {

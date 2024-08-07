@@ -10,7 +10,7 @@ const mix = require("laravel-mix");
  | file for the application as well as bundling up all the JS files.
  |
  */
-
+ mix.setResourceRoot('https://nhathuoc.up.railway.app/'); 
 mix.js("resources/js/app.js", "public/js");
 mix.styles(["resources/js/app.js"], "public/css/app.css").version();
 

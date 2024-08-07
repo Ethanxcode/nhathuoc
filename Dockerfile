@@ -31,6 +31,7 @@ RUN echo "DirectoryIndex index.php" >> /etc/apache2/apache2.conf
 # Copy existing application directory contents and set permissions
 COPY --chown=www-data:www-data . /var/www/html
 
+
 # Install Node.js dependencies
 RUN npm install --legacy-peer-dep
 RUN npm run prod

@@ -1,5 +1,5 @@
-# Sử dụng hình ảnh chính thức của PHP với Apache
-FROM php:8.1-apache
+# Sử dụng hình ảnh chính thức của PHP với Apache và PHP 7.3
+FROM php:7.3-apache
 
 # Cài đặt các extension PHP cần thiết và các công cụ khác
 RUN apt-get update && apt-get install -y \
@@ -29,7 +29,7 @@ COPY . /var/www/html
 RUN composer install --no-dev --optimize-autoloader
 
 # Cài đặt Node.js và npm, sau đó cài đặt các phụ thuộc Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
     && apt-get install -y nodejs \
     && npm install \
     && npm run prod

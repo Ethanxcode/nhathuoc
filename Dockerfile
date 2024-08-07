@@ -24,6 +24,8 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 # Set DirectoryIndex to index.php
 RUN echo "DirectoryIndex index.php" >> /etc/apache2/apache2.conf
 
+COPY .env.production /var/www/html/.env
+
 # Copy existing application directory contents and set permissions
 COPY --chown=www-data:www-data . /var/www/html
 
@@ -31,5 +33,3 @@ COPY --chown=www-data:www-data . /var/www/html
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Start Apache in the foreground
-CMD ["apache2-foreground"]

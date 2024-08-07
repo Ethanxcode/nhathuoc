@@ -1,0 +1,26 @@
+[phases.setup]
+apt = ["php-mysql"]
+
+[phases.install]
+commands = [
+  "composer install --no-interaction --prefer-dist --optimize-autoloader",
+  "npm install"
+]
+
+[phases.build]
+commands = [
+  "npm run prod",
+  "php artisan migrate --force",
+  "php artisan config:cache",
+  "php artisan route:cache",
+  "php artisan view:cache"
+]
+
+[phases.start]
+commands = [
+  "php-fpm",
+  "nginx -g 'daemon off;'"
+]
+
+[phases]
+builder = "laravel"

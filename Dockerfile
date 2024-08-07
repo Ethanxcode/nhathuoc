@@ -24,12 +24,23 @@ RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 # Set DirectoryIndex to index.php
 RUN echo "DirectoryIndex index.php" >> /etc/apache2/apache2.conf
 
+# Enable Apache logging
+RUN echo "LogLevel debug" >> /etc/apache2/apache2.conf \
+    && echo "ErrorLog ${APACHE_LOG_DIR}/error.log" >> /etc/apache2/apache2.conf \
+    && echo "CustomLog ${APACHE_LOG_DIR}/access.log combined" >> /etc/apache2/apache2.conf
+
 COPY .env.production /var/www/html/.env
 
 # Copy existing application directory contents and set permissions
 COPY --chown=www-data:www-data . /var/www/html
 
+# Ensure correct permissions for Laravel storage and cache directories
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
 # Ensure correct permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
+# Expose port 80
+EXPOSE 80

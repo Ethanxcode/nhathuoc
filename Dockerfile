@@ -27,6 +27,10 @@ RUN echo "DirectoryIndex index.php" >> /etc/apache2/apache2.conf
 # Copy existing application directory contents and set permissions
 COPY --chown=www-data:www-data . /var/www/html
 
+# Install Node.js dependencies
+RUN npm install
+
+
 # Ensure correct permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html

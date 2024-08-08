@@ -52,10 +52,10 @@
 
 @section('scripts')
 <script>
-let recordsURL = "{{ secure_url(route('productbuy')) }}/";
+let recordsURL = "{{ secure_url('productbuy') }}/";
 </script>
-<script src="{{ asset('assets/js/jquery.dataTables.min.js') }}"></script>
-<script src="{{ asset('assets/js/custom/custom-datatable.js') }}"></script>
+<script src="{{ secure_asset('assets/js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ secure_asset('assets/js/custom/custom-datatable.js') }}"></script>
 <script>
 "use strict";
 
